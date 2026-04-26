@@ -28,6 +28,7 @@ typedef struct {
 #define RCC    ((RCC_Type *)RCC_BASE)
 
 void delay_ms(uint32_t ms);
+void SystemClock_Config_Max(void);
 
 
 #define SYSTICK_BASE    0xE000E010UL
@@ -41,4 +42,27 @@ typedef struct {
 extern uint32_t SystemCoreClock;
 #define SysTick    ((My_SysTick_Struct*)SYSTICK_BASE)
 
+//PWR
+
+typedef struct{
+	volatile uint32_t CR1;
+	volatile uint32_t CSR1;
+	volatile uint32_t CR2;
+	volatile uint32_t CSR2;
+}PWR_Type;
+#define PWR_BASE		0x40007000UL
+#define PWR		((PWR_Type*)PWR_BASE)
+
+// FLASH
+#define FLASH_BASE		0x40023C00UL
+typedef struct{
+	volatile uint32_t ACR;
+	volatile uint32_t KEYR;
+	volatile uint32_t OPTKEYR;
+	volatile uint32_t SR;
+	volatile uint32_t CR;
+	volatile uint32_t OPTCR;
+	volatile uint32_t OPTCR1;
+}FLASH_Type;
+#define FLASH		((FLASH_Type*)FLASH_BASE)
 #endif /*__RCC_H__*/

@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 0000002e  00000000  00000000  00003010  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00002d74  00000000  00000000  0000303e  2**0
+ 12 .debug_info   00002f15  00000000  00000000  0000303e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000c27  00000000  00000000  00005db2  2**0
+ 13 .debug_abbrev 00000c5d  00000000  00000000  00005f53  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000358  00000000  00000000  000069e0  2**3
+ 14 .debug_aranges 00000358  00000000  00000000  00006bb0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00000254  00000000  00000000  00006d38  2**0
+ 15 .debug_rnglists 00000254  00000000  00000000  00006f08  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00026dba  00000000  00000000  00006f8c  2**0
+ 16 .debug_macro  00026dea  00000000  00000000  0000715c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00004546  00000000  00000000  0002dd46  2**0
+ 17 .debug_line   00004553  00000000  00000000  0002df46  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000f33ff  00000000  00000000  0003228c  2**0
+ 18 .debug_str    000f3490  00000000  00000000  00032499  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0012568b  2**0
+ 19 .comment      00000043  00000000  00000000  00125929  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000097c  00000000  00000000  001256d0  2**2
+ 20 .debug_frame  0000097c  00000000  00000000  0012596c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000071  00000000  00000000  0012604c  2**0
+ 21 .debug_line_str 00000071  00000000  00000000  001262e8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -157,14 +157,14 @@ void ST7735_Init() {
  80002a4:	f000 f88c 	bl	80003c0 <ST7735_WriteCommand>
     delay_ms(150);
  80002a8:	2096      	movs	r0, #150	@ 0x96
- 80002aa:	f000 fc15 	bl	8000ad8 <delay_ms>
+ 80002aa:	f000 fb83 	bl	80009b4 <delay_ms>
 
     ST7735_WriteCommand(0x11); // Sleep Out
  80002ae:	2011      	movs	r0, #17
  80002b0:	f000 f886 	bl	80003c0 <ST7735_WriteCommand>
     delay_ms(150);
  80002b4:	2096      	movs	r0, #150	@ 0x96
- 80002b6:	f000 fc0f 	bl	8000ad8 <delay_ms>
+ 80002b6:	f000 fb7d 	bl	80009b4 <delay_ms>
 
     // 색상 포맷 설정 (16-bit color)
     ST7735_WriteCommand(0x3A);
@@ -181,7 +181,7 @@ void ST7735_Init() {
 
     delay_ms(100);
  80002cc:	2064      	movs	r0, #100	@ 0x64
- 80002ce:	f000 fc03 	bl	8000ad8 <delay_ms>
+ 80002ce:	f000 fb71 	bl	80009b4 <delay_ms>
 }
  80002d2:	bf00      	nop
  80002d4:	bd80      	pop	{r7, pc}
@@ -302,19 +302,19 @@ void ST7735_HW_Reset() {
  800039c:	f000 f908 	bl	80005b0 <RESET_pin_set>
     delay_ms(10);     // 잠시 대기
  80003a0:	200a      	movs	r0, #10
- 80003a2:	f000 fb99 	bl	8000ad8 <delay_ms>
+ 80003a2:	f000 fb07 	bl	80009b4 <delay_ms>
 
     RESET_pin_reset(); // 2. Low로 떨어뜨려 리셋 신호 발생
  80003a6:	f000 f90f 	bl	80005c8 <RESET_pin_reset>
     delay_ms(20);    // 데이터시트상 최소 시간 유지 (보통 10~20ms)
  80003aa:	2014      	movs	r0, #20
- 80003ac:	f000 fb94 	bl	8000ad8 <delay_ms>
+ 80003ac:	f000 fb02 	bl	80009b4 <delay_ms>
 
     RESET_pin_set();   // 3. 다시 High로 올려서 리셋 종료
  80003b0:	f000 f8fe 	bl	80005b0 <RESET_pin_set>
     delay_ms(100);    // 4. 칩이 내부 정리를 마칠 때까지 대기 (중요!)
  80003b4:	2064      	movs	r0, #100	@ 0x64
- 80003b6:	f000 fb8f 	bl	8000ad8 <delay_ms>
+ 80003b6:	f000 fafd 	bl	80009b4 <delay_ms>
 }
  80003ba:	bf00      	nop
  80003bc:	bd80      	pop	{r7, pc}
@@ -1091,7 +1091,7 @@ int main(void)
  800093e:	b086      	sub	sp, #24
  8000940:	af04      	add	r7, sp, #16
 	SystemClock_Config_Max();
- 8000942:	f000 f837 	bl	80009b4 <SystemClock_Config_Max>
+ 8000942:	f000 f86f 	bl	8000a24 <SystemClock_Config_Max>
 	SystemCoreClock = 216000000;
  8000946:	4b15      	ldr	r3, [pc, #84]	@ (800099c <main+0x60>)
  8000948:	4a15      	ldr	r2, [pc, #84]	@ (80009a0 <main+0x64>)
@@ -1143,260 +1143,254 @@ int main(void)
  80009ac:	08000ef4 	.word	0x08000ef4
  80009b0:	42a00000 	.word	0x42a00000
 
-080009b4 <SystemClock_Config_Max>:
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-void SystemClock_Config_Max(void) {
+080009b4 <delay_ms>:
+#include "rcc.h"
+//uint32_t SystemCoreClock = 216000000;
+void delay_ms(uint32_t ms) {
  80009b4:	b480      	push	{r7}
- 80009b6:	b089      	sub	sp, #36	@ 0x24
+ 80009b6:	b085      	sub	sp, #20
  80009b8:	af00      	add	r7, sp, #0
-    /* 1. 레지스터 주소 정의 (STM32F767ZI 기준) */
+ 80009ba:	6078      	str	r0, [r7, #4]
+    if (ms == 0) return;
+ 80009bc:	687b      	ldr	r3, [r7, #4]
+ 80009be:	2b00      	cmp	r3, #0
+ 80009c0:	d023      	beq.n	8000a0a <delay_ms+0x56>
+
+    // 1. SysTick 설정: 1ms 주기로 설정
+    SysTick->LOAD = (SystemCoreClock / 1000) - 1;
+ 80009c2:	4b15      	ldr	r3, [pc, #84]	@ (8000a18 <delay_ms+0x64>)
+ 80009c4:	681b      	ldr	r3, [r3, #0]
+ 80009c6:	4a15      	ldr	r2, [pc, #84]	@ (8000a1c <delay_ms+0x68>)
+ 80009c8:	fba2 2303 	umull	r2, r3, r2, r3
+ 80009cc:	099b      	lsrs	r3, r3, #6
+ 80009ce:	4a14      	ldr	r2, [pc, #80]	@ (8000a20 <delay_ms+0x6c>)
+ 80009d0:	3b01      	subs	r3, #1
+ 80009d2:	6053      	str	r3, [r2, #4]
+    SysTick->VAL = 0; // 현재 값 초기화
+ 80009d4:	4b12      	ldr	r3, [pc, #72]	@ (8000a20 <delay_ms+0x6c>)
+ 80009d6:	2200      	movs	r2, #0
+ 80009d8:	609a      	str	r2, [r3, #8]
+    SysTick->CTRL = (1 << 2) | (1 << 0); // Processor Clock 사용, 타이머 활성화
+ 80009da:	4b11      	ldr	r3, [pc, #68]	@ (8000a20 <delay_ms+0x6c>)
+ 80009dc:	2205      	movs	r2, #5
+ 80009de:	601a      	str	r2, [r3, #0]
+
+    for (uint32_t i = 0; i < ms; i++) {
+ 80009e0:	2300      	movs	r3, #0
+ 80009e2:	60fb      	str	r3, [r7, #12]
+ 80009e4:	e009      	b.n	80009fa <delay_ms+0x46>
+        while (!(SysTick->CTRL & (1 << 16)));
+ 80009e6:	bf00      	nop
+ 80009e8:	4b0d      	ldr	r3, [pc, #52]	@ (8000a20 <delay_ms+0x6c>)
+ 80009ea:	681b      	ldr	r3, [r3, #0]
+ 80009ec:	f403 3380 	and.w	r3, r3, #65536	@ 0x10000
+ 80009f0:	2b00      	cmp	r3, #0
+ 80009f2:	d0f9      	beq.n	80009e8 <delay_ms+0x34>
+    for (uint32_t i = 0; i < ms; i++) {
+ 80009f4:	68fb      	ldr	r3, [r7, #12]
+ 80009f6:	3301      	adds	r3, #1
+ 80009f8:	60fb      	str	r3, [r7, #12]
+ 80009fa:	68fa      	ldr	r2, [r7, #12]
+ 80009fc:	687b      	ldr	r3, [r7, #4]
+ 80009fe:	429a      	cmp	r2, r3
+ 8000a00:	d3f1      	bcc.n	80009e6 <delay_ms+0x32>
+    }
+
+    // 3. 종료 후 타이머 끄기
+    SysTick->CTRL = 0;
+ 8000a02:	4b07      	ldr	r3, [pc, #28]	@ (8000a20 <delay_ms+0x6c>)
+ 8000a04:	2200      	movs	r2, #0
+ 8000a06:	601a      	str	r2, [r3, #0]
+ 8000a08:	e000      	b.n	8000a0c <delay_ms+0x58>
+    if (ms == 0) return;
+ 8000a0a:	bf00      	nop
+}
+ 8000a0c:	3714      	adds	r7, #20
+ 8000a0e:	46bd      	mov	sp, r7
+ 8000a10:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000a14:	4770      	bx	lr
+ 8000a16:	bf00      	nop
+ 8000a18:	20000008 	.word	0x20000008
+ 8000a1c:	10624dd3 	.word	0x10624dd3
+ 8000a20:	e000e010 	.word	0xe000e010
+
+08000a24 <SystemClock_Config_Max>:
+void SystemClock_Config_Max(void) {
+ 8000a24:	b480      	push	{r7}
+ 8000a26:	b089      	sub	sp, #36	@ 0x24
+ 8000a28:	af00      	add	r7, sp, #0
     volatile uint32_t *const RCC_CR      = (uint32_t *)0x40023800UL;
- 80009ba:	4b3f      	ldr	r3, [pc, #252]	@ (8000ab8 <SystemClock_Config_Max+0x104>)
- 80009bc:	61bb      	str	r3, [r7, #24]
+ 8000a2a:	4b3f      	ldr	r3, [pc, #252]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a2c:	61bb      	str	r3, [r7, #24]
     volatile uint32_t *const RCC_PLLCFGR = (uint32_t *)0x40023804UL;
- 80009be:	4b3f      	ldr	r3, [pc, #252]	@ (8000abc <SystemClock_Config_Max+0x108>)
- 80009c0:	617b      	str	r3, [r7, #20]
+ 8000a2e:	4b3f      	ldr	r3, [pc, #252]	@ (8000b2c <SystemClock_Config_Max+0x108>)
+ 8000a30:	617b      	str	r3, [r7, #20]
     volatile uint32_t *const RCC_CFGR    = (uint32_t *)0x40023808UL;
- 80009c2:	4b3f      	ldr	r3, [pc, #252]	@ (8000ac0 <SystemClock_Config_Max+0x10c>)
- 80009c4:	613b      	str	r3, [r7, #16]
+ 8000a32:	4b3f      	ldr	r3, [pc, #252]	@ (8000b30 <SystemClock_Config_Max+0x10c>)
+ 8000a34:	613b      	str	r3, [r7, #16]
     volatile uint32_t *const RCC_APB1ENR = (uint32_t *)0x40023840UL;
- 80009c6:	4b3f      	ldr	r3, [pc, #252]	@ (8000ac4 <SystemClock_Config_Max+0x110>)
- 80009c8:	60fb      	str	r3, [r7, #12]
+ 8000a36:	4b3f      	ldr	r3, [pc, #252]	@ (8000b34 <SystemClock_Config_Max+0x110>)
+ 8000a38:	60fb      	str	r3, [r7, #12]
     volatile uint32_t *const PWR_CR1     = (uint32_t *)0x40007000UL;
- 80009ca:	4b3f      	ldr	r3, [pc, #252]	@ (8000ac8 <SystemClock_Config_Max+0x114>)
- 80009cc:	60bb      	str	r3, [r7, #8]
+ 8000a3a:	4b3f      	ldr	r3, [pc, #252]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000a3c:	60bb      	str	r3, [r7, #8]
     volatile uint32_t *const PWR_CSR1    = (uint32_t *)0x40007004UL;
- 80009ce:	4b3f      	ldr	r3, [pc, #252]	@ (8000acc <SystemClock_Config_Max+0x118>)
- 80009d0:	607b      	str	r3, [r7, #4]
+ 8000a3e:	4b3f      	ldr	r3, [pc, #252]	@ (8000b3c <SystemClock_Config_Max+0x118>)
+ 8000a40:	607b      	str	r3, [r7, #4]
     volatile uint32_t *const FLASH_ACR   = (uint32_t *)0x40023C00UL;
- 80009d2:	4b3f      	ldr	r3, [pc, #252]	@ (8000ad0 <SystemClock_Config_Max+0x11c>)
- 80009d4:	603b      	str	r3, [r7, #0]
+ 8000a42:	4b3f      	ldr	r3, [pc, #252]	@ (8000b40 <SystemClock_Config_Max+0x11c>)
+ 8000a44:	603b      	str	r3, [r7, #0]
 
     /* 2. HSE (External Crystal) 활성화 */
-    *RCC_CR |= (1 << 16); // HSEON
- 80009d6:	69bb      	ldr	r3, [r7, #24]
- 80009d8:	681b      	ldr	r3, [r3, #0]
- 80009da:	f443 3280 	orr.w	r2, r3, #65536	@ 0x10000
- 80009de:	69bb      	ldr	r3, [r7, #24]
- 80009e0:	601a      	str	r2, [r3, #0]
-    while (!(*RCC_CR & (1 << 17))); // HSERDY 대기
- 80009e2:	bf00      	nop
- 80009e4:	69bb      	ldr	r3, [r7, #24]
- 80009e6:	681b      	ldr	r3, [r3, #0]
- 80009e8:	f403 3300 	and.w	r3, r3, #131072	@ 0x20000
- 80009ec:	2b00      	cmp	r3, #0
- 80009ee:	d0f9      	beq.n	80009e4 <SystemClock_Config_Max+0x30>
+    RCC->CR |= (1 << 16); // HSEON
+ 8000a46:	4b38      	ldr	r3, [pc, #224]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a48:	681b      	ldr	r3, [r3, #0]
+ 8000a4a:	4a37      	ldr	r2, [pc, #220]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a4c:	f443 3380 	orr.w	r3, r3, #65536	@ 0x10000
+ 8000a50:	6013      	str	r3, [r2, #0]
+    while (!(RCC->CR & (1 << 17))); // HSERDY 대기
+ 8000a52:	bf00      	nop
+ 8000a54:	4b34      	ldr	r3, [pc, #208]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a56:	681b      	ldr	r3, [r3, #0]
+ 8000a58:	f403 3300 	and.w	r3, r3, #131072	@ 0x20000
+ 8000a5c:	2b00      	cmp	r3, #0
+ 8000a5e:	d0f9      	beq.n	8000a54 <SystemClock_Config_Max+0x30>
 
     /* 3. 전원 인터페이스 클럭 활성화 및 VOS 설정 */
-    *RCC_APB1ENR |= (1 << 28); // PWREN
- 80009f0:	68fb      	ldr	r3, [r7, #12]
- 80009f2:	681b      	ldr	r3, [r3, #0]
- 80009f4:	f043 5280 	orr.w	r2, r3, #268435456	@ 0x10000000
- 80009f8:	68fb      	ldr	r3, [r7, #12]
- 80009fa:	601a      	str	r2, [r3, #0]
-    (void)*RCC_APB1ENR; // 클럭 안정화를 위한 더미 읽기
- 80009fc:	68fb      	ldr	r3, [r7, #12]
- 80009fe:	681b      	ldr	r3, [r3, #0]
+    RCC->APB1ENR |= (1 << 28); // PWREN
+ 8000a60:	4b31      	ldr	r3, [pc, #196]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a62:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
+ 8000a64:	4a30      	ldr	r2, [pc, #192]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a66:	f043 5380 	orr.w	r3, r3, #268435456	@ 0x10000000
+ 8000a6a:	6413      	str	r3, [r2, #64]	@ 0x40
+    (void)RCC->APB1ENR; // 클럭 안정화를 위한 더미 읽기
+ 8000a6c:	4b2e      	ldr	r3, [pc, #184]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000a6e:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
 
     // VOS Scale 1 설정 (비트 14:15를 11로)
-    *PWR_CR1 |= (3 << 14);
- 8000a00:	68bb      	ldr	r3, [r7, #8]
- 8000a02:	681b      	ldr	r3, [r3, #0]
- 8000a04:	f443 4240 	orr.w	r2, r3, #49152	@ 0xc000
- 8000a08:	68bb      	ldr	r3, [r7, #8]
- 8000a0a:	601a      	str	r2, [r3, #0]
+    PWR->CR1 |= (3 << 14);
+ 8000a70:	4b31      	ldr	r3, [pc, #196]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000a72:	681b      	ldr	r3, [r3, #0]
+ 8000a74:	4a30      	ldr	r2, [pc, #192]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000a76:	f443 4340 	orr.w	r3, r3, #49152	@ 0xc000
+ 8000a7a:	6013      	str	r3, [r2, #0]
 
     // VOSRDY 대기 (멈춤 방지를 위한 타이아웃 처리)
     uint32_t timeout = 0xFFFF;
- 8000a0c:	f64f 73ff 	movw	r3, #65535	@ 0xffff
- 8000a10:	61fb      	str	r3, [r7, #28]
-    while (!(*PWR_CSR1 & (1 << 14)) && timeout--);
- 8000a12:	bf00      	nop
- 8000a14:	687b      	ldr	r3, [r7, #4]
- 8000a16:	681b      	ldr	r3, [r3, #0]
- 8000a18:	f403 4380 	and.w	r3, r3, #16384	@ 0x4000
- 8000a1c:	2b00      	cmp	r3, #0
- 8000a1e:	d104      	bne.n	8000a2a <SystemClock_Config_Max+0x76>
- 8000a20:	69fb      	ldr	r3, [r7, #28]
- 8000a22:	1e5a      	subs	r2, r3, #1
- 8000a24:	61fa      	str	r2, [r7, #28]
- 8000a26:	2b00      	cmp	r3, #0
- 8000a28:	d1f4      	bne.n	8000a14 <SystemClock_Config_Max+0x60>
+ 8000a7c:	f64f 73ff 	movw	r3, #65535	@ 0xffff
+ 8000a80:	61fb      	str	r3, [r7, #28]
+    while (!(PWR->CR1 & (1 << 14)) && timeout--);
+ 8000a82:	bf00      	nop
+ 8000a84:	4b2c      	ldr	r3, [pc, #176]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000a86:	681b      	ldr	r3, [r3, #0]
+ 8000a88:	f403 4380 	and.w	r3, r3, #16384	@ 0x4000
+ 8000a8c:	2b00      	cmp	r3, #0
+ 8000a8e:	d104      	bne.n	8000a9a <SystemClock_Config_Max+0x76>
+ 8000a90:	69fb      	ldr	r3, [r7, #28]
+ 8000a92:	1e5a      	subs	r2, r3, #1
+ 8000a94:	61fa      	str	r2, [r7, #28]
+ 8000a96:	2b00      	cmp	r3, #0
+ 8000a98:	d1f4      	bne.n	8000a84 <SystemClock_Config_Max+0x60>
 
     /* 4. Over-drive 모드 활성화 (216MHz 필수 시퀀스) */
-    *PWR_CR1 |= (1 << 16); // ODEN (Over-drive Enable)
- 8000a2a:	68bb      	ldr	r3, [r7, #8]
- 8000a2c:	681b      	ldr	r3, [r3, #0]
- 8000a2e:	f443 3280 	orr.w	r2, r3, #65536	@ 0x10000
- 8000a32:	68bb      	ldr	r3, [r7, #8]
- 8000a34:	601a      	str	r2, [r3, #0]
-    while (!(*PWR_CSR1 & (1 << 16))); // ODRDY 대기
- 8000a36:	bf00      	nop
- 8000a38:	687b      	ldr	r3, [r7, #4]
- 8000a3a:	681b      	ldr	r3, [r3, #0]
- 8000a3c:	f403 3380 	and.w	r3, r3, #65536	@ 0x10000
- 8000a40:	2b00      	cmp	r3, #0
- 8000a42:	d0f9      	beq.n	8000a38 <SystemClock_Config_Max+0x84>
+    PWR->CR1 |= (1 << 16); // ODEN (Over-drive Enable)
+ 8000a9a:	4b27      	ldr	r3, [pc, #156]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000a9c:	681b      	ldr	r3, [r3, #0]
+ 8000a9e:	4a26      	ldr	r2, [pc, #152]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000aa0:	f443 3380 	orr.w	r3, r3, #65536	@ 0x10000
+ 8000aa4:	6013      	str	r3, [r2, #0]
+    while (!(PWR->CSR1 & (1 << 16))); // ODRDY 대기
+ 8000aa6:	bf00      	nop
+ 8000aa8:	4b23      	ldr	r3, [pc, #140]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000aaa:	685b      	ldr	r3, [r3, #4]
+ 8000aac:	f403 3380 	and.w	r3, r3, #65536	@ 0x10000
+ 8000ab0:	2b00      	cmp	r3, #0
+ 8000ab2:	d0f9      	beq.n	8000aa8 <SystemClock_Config_Max+0x84>
 
-    *PWR_CR1 |= (1 << 17); // ODSWEN (Over-drive Switching Enable)
- 8000a44:	68bb      	ldr	r3, [r7, #8]
- 8000a46:	681b      	ldr	r3, [r3, #0]
- 8000a48:	f443 3200 	orr.w	r2, r3, #131072	@ 0x20000
- 8000a4c:	68bb      	ldr	r3, [r7, #8]
- 8000a4e:	601a      	str	r2, [r3, #0]
-    while (!(*PWR_CSR1 & (1 << 17))); // ODSWRDY 대기
- 8000a50:	bf00      	nop
- 8000a52:	687b      	ldr	r3, [r7, #4]
- 8000a54:	681b      	ldr	r3, [r3, #0]
- 8000a56:	f403 3300 	and.w	r3, r3, #131072	@ 0x20000
- 8000a5a:	2b00      	cmp	r3, #0
- 8000a5c:	d0f9      	beq.n	8000a52 <SystemClock_Config_Max+0x9e>
+    PWR->CR1 |= (1 << 17); // ODSWEN (Over-drive Switching Enable)
+ 8000ab4:	4b20      	ldr	r3, [pc, #128]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000ab6:	681b      	ldr	r3, [r3, #0]
+ 8000ab8:	4a1f      	ldr	r2, [pc, #124]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000aba:	f443 3300 	orr.w	r3, r3, #131072	@ 0x20000
+ 8000abe:	6013      	str	r3, [r2, #0]
+    while (!(PWR->CSR1 & (1 << 17))); // ODSWRDY 대기
+ 8000ac0:	bf00      	nop
+ 8000ac2:	4b1d      	ldr	r3, [pc, #116]	@ (8000b38 <SystemClock_Config_Max+0x114>)
+ 8000ac4:	685b      	ldr	r3, [r3, #4]
+ 8000ac6:	f403 3300 	and.w	r3, r3, #131072	@ 0x20000
+ 8000aca:	2b00      	cmp	r3, #0
+ 8000acc:	d0f9      	beq.n	8000ac2 <SystemClock_Config_Max+0x9e>
 
     /* 5. Flash ACR 설정 (216MHz에서는 반드시 7 Wait States 필요) */
     // ART Accelerator 활성화 (ICEN, DCEN, PRFTEN) + Latency 7WS
-    *FLASH_ACR = (1 << 9) | (1 << 10) | (1 << 8) | (7 << 0);
- 8000a5e:	683b      	ldr	r3, [r7, #0]
- 8000a60:	f240 7207 	movw	r2, #1799	@ 0x707
- 8000a64:	601a      	str	r2, [r3, #0]
+    FLASH->ACR = (1 << 9) | (1 << 10) | (1 << 8) | (7 << 0);
+ 8000ace:	4b1c      	ldr	r3, [pc, #112]	@ (8000b40 <SystemClock_Config_Max+0x11c>)
+ 8000ad0:	f240 7207 	movw	r2, #1799	@ 0x707
+ 8000ad4:	601a      	str	r2, [r3, #0]
      * PLL_M = 4   => 8MHz / 4 = 2MHz (PLL 입력은 1~2MHz 권장)
      * PLL_N = 216 => 2MHz * 216 = 432MHz (VCO 출력)
      * PLL_P = 2   => 432MHz / 2 = 216MHz (최종 SYSCLK)
      * SRC = HSE (1 << 22)
      */
-    *RCC_PLLCFGR = (4 << 0) | (216 << 6) | (0 << 16) | (1 << 22);
- 8000a66:	697b      	ldr	r3, [r7, #20]
- 8000a68:	4a1a      	ldr	r2, [pc, #104]	@ (8000ad4 <SystemClock_Config_Max+0x120>)
- 8000a6a:	601a      	str	r2, [r3, #0]
+    RCC->PLLCFGR = (4 << 0) | (216 << 6) | (0 << 16) | (1 << 22);
+ 8000ad6:	4b14      	ldr	r3, [pc, #80]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000ad8:	4a1a      	ldr	r2, [pc, #104]	@ (8000b44 <SystemClock_Config_Max+0x120>)
+ 8000ada:	605a      	str	r2, [r3, #4]
 
     /* 7. PLL 활성화 */
-    *RCC_CR |= (1 << 24); // PLLON
- 8000a6c:	69bb      	ldr	r3, [r7, #24]
- 8000a6e:	681b      	ldr	r3, [r3, #0]
- 8000a70:	f043 7280 	orr.w	r2, r3, #16777216	@ 0x1000000
- 8000a74:	69bb      	ldr	r3, [r7, #24]
- 8000a76:	601a      	str	r2, [r3, #0]
-    while (!(*RCC_CR & (1 << 25))); // PLLRDY 대기
- 8000a78:	bf00      	nop
- 8000a7a:	69bb      	ldr	r3, [r7, #24]
- 8000a7c:	681b      	ldr	r3, [r3, #0]
- 8000a7e:	f003 7300 	and.w	r3, r3, #33554432	@ 0x2000000
- 8000a82:	2b00      	cmp	r3, #0
- 8000a84:	d0f9      	beq.n	8000a7a <SystemClock_Config_Max+0xc6>
+    RCC->CR |= (1 << 24); // PLLON
+ 8000adc:	4b12      	ldr	r3, [pc, #72]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000ade:	681b      	ldr	r3, [r3, #0]
+ 8000ae0:	4a11      	ldr	r2, [pc, #68]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000ae2:	f043 7380 	orr.w	r3, r3, #16777216	@ 0x1000000
+ 8000ae6:	6013      	str	r3, [r2, #0]
+    while (!(RCC->CR & (1 << 25))); // PLLRDY 대기
+ 8000ae8:	bf00      	nop
+ 8000aea:	4b0f      	ldr	r3, [pc, #60]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000aec:	681b      	ldr	r3, [r3, #0]
+ 8000aee:	f003 7300 	and.w	r3, r3, #33554432	@ 0x2000000
+ 8000af2:	2b00      	cmp	r3, #0
+ 8000af4:	d0f9      	beq.n	8000aea <SystemClock_Config_Max+0xc6>
     /* 8. 버스 분주비(Prescaler) 설정
      * AHB  = SYSCLK / 1 = 216MHz (HPRE = 0xxx)
      * APB1 = SYSCLK / 4 = 54MHz  (PPRE1 = 101, Max 54MHz)
      * APB2 = SYSCLK / 2 = 108MHz (PPRE2 = 100, Max 108MHz)
      */
-    *RCC_CFGR = (0 << 4) | (5 << 10) | (4 << 13);
- 8000a86:	693b      	ldr	r3, [r7, #16]
- 8000a88:	f44f 4214 	mov.w	r2, #37888	@ 0x9400
- 8000a8c:	601a      	str	r2, [r3, #0]
+    RCC->CFGR = (0 << 4) | (5 << 10) | (4 << 13);
+ 8000af6:	4b0c      	ldr	r3, [pc, #48]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000af8:	f44f 4214 	mov.w	r2, #37888	@ 0x9400
+ 8000afc:	609a      	str	r2, [r3, #8]
 
     /* 9. 시스템 클럭 전환 (SYSCLK Source = PLL) */
-    *RCC_CFGR |= (2 << 0); // SW = PLL
- 8000a8e:	693b      	ldr	r3, [r7, #16]
- 8000a90:	681b      	ldr	r3, [r3, #0]
- 8000a92:	f043 0202 	orr.w	r2, r3, #2
- 8000a96:	693b      	ldr	r3, [r7, #16]
- 8000a98:	601a      	str	r2, [r3, #0]
-    while ((*RCC_CFGR & (0x0C)) != (0x08)); // SWS가 PLL(10)인지 확인
- 8000a9a:	bf00      	nop
- 8000a9c:	693b      	ldr	r3, [r7, #16]
- 8000a9e:	681b      	ldr	r3, [r3, #0]
- 8000aa0:	f003 030c 	and.w	r3, r3, #12
- 8000aa4:	2b08      	cmp	r3, #8
- 8000aa6:	d1f9      	bne.n	8000a9c <SystemClock_Config_Max+0xe8>
-}
- 8000aa8:	bf00      	nop
- 8000aaa:	bf00      	nop
- 8000aac:	3724      	adds	r7, #36	@ 0x24
- 8000aae:	46bd      	mov	sp, r7
- 8000ab0:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000ab4:	4770      	bx	lr
- 8000ab6:	bf00      	nop
- 8000ab8:	40023800 	.word	0x40023800
- 8000abc:	40023804 	.word	0x40023804
- 8000ac0:	40023808 	.word	0x40023808
- 8000ac4:	40023840 	.word	0x40023840
- 8000ac8:	40007000 	.word	0x40007000
- 8000acc:	40007004 	.word	0x40007004
- 8000ad0:	40023c00 	.word	0x40023c00
- 8000ad4:	00403604 	.word	0x00403604
-
-08000ad8 <delay_ms>:
-#include "rcc.h"
-//uint32_t SystemCoreClock = 216000000;
-void delay_ms(uint32_t ms) {
- 8000ad8:	b480      	push	{r7}
- 8000ada:	b085      	sub	sp, #20
- 8000adc:	af00      	add	r7, sp, #0
- 8000ade:	6078      	str	r0, [r7, #4]
-    if (ms == 0) return;
- 8000ae0:	687b      	ldr	r3, [r7, #4]
- 8000ae2:	2b00      	cmp	r3, #0
- 8000ae4:	d023      	beq.n	8000b2e <delay_ms+0x56>
-
-    // 1. SysTick 설정: 1ms 주기로 설정
-    SysTick->LOAD = (SystemCoreClock / 1000) - 1;
- 8000ae6:	4b15      	ldr	r3, [pc, #84]	@ (8000b3c <delay_ms+0x64>)
- 8000ae8:	681b      	ldr	r3, [r3, #0]
- 8000aea:	4a15      	ldr	r2, [pc, #84]	@ (8000b40 <delay_ms+0x68>)
- 8000aec:	fba2 2303 	umull	r2, r3, r2, r3
- 8000af0:	099b      	lsrs	r3, r3, #6
- 8000af2:	4a14      	ldr	r2, [pc, #80]	@ (8000b44 <delay_ms+0x6c>)
- 8000af4:	3b01      	subs	r3, #1
- 8000af6:	6053      	str	r3, [r2, #4]
-    SysTick->VAL = 0; // 현재 값 초기화
- 8000af8:	4b12      	ldr	r3, [pc, #72]	@ (8000b44 <delay_ms+0x6c>)
- 8000afa:	2200      	movs	r2, #0
- 8000afc:	609a      	str	r2, [r3, #8]
-    SysTick->CTRL = (1 << 2) | (1 << 0); // Processor Clock 사용, 타이머 활성화
- 8000afe:	4b11      	ldr	r3, [pc, #68]	@ (8000b44 <delay_ms+0x6c>)
- 8000b00:	2205      	movs	r2, #5
- 8000b02:	601a      	str	r2, [r3, #0]
-
-    for (uint32_t i = 0; i < ms; i++) {
- 8000b04:	2300      	movs	r3, #0
- 8000b06:	60fb      	str	r3, [r7, #12]
- 8000b08:	e009      	b.n	8000b1e <delay_ms+0x46>
-        while (!(SysTick->CTRL & (1 << 16)));
+    RCC->CFGR |= (2 << 0); // SW = PLL
+ 8000afe:	4b0a      	ldr	r3, [pc, #40]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000b00:	689b      	ldr	r3, [r3, #8]
+ 8000b02:	4a09      	ldr	r2, [pc, #36]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000b04:	f043 0302 	orr.w	r3, r3, #2
+ 8000b08:	6093      	str	r3, [r2, #8]
+    while ((RCC->CFGR & (0x0C)) != (0x08)); // SWS가 PLL(10)인지 확인
  8000b0a:	bf00      	nop
- 8000b0c:	4b0d      	ldr	r3, [pc, #52]	@ (8000b44 <delay_ms+0x6c>)
- 8000b0e:	681b      	ldr	r3, [r3, #0]
- 8000b10:	f403 3380 	and.w	r3, r3, #65536	@ 0x10000
- 8000b14:	2b00      	cmp	r3, #0
- 8000b16:	d0f9      	beq.n	8000b0c <delay_ms+0x34>
-    for (uint32_t i = 0; i < ms; i++) {
- 8000b18:	68fb      	ldr	r3, [r7, #12]
- 8000b1a:	3301      	adds	r3, #1
- 8000b1c:	60fb      	str	r3, [r7, #12]
- 8000b1e:	68fa      	ldr	r2, [r7, #12]
- 8000b20:	687b      	ldr	r3, [r7, #4]
- 8000b22:	429a      	cmp	r2, r3
- 8000b24:	d3f1      	bcc.n	8000b0a <delay_ms+0x32>
-    }
-
-    // 3. 종료 후 타이머 끄기
-    SysTick->CTRL = 0;
- 8000b26:	4b07      	ldr	r3, [pc, #28]	@ (8000b44 <delay_ms+0x6c>)
- 8000b28:	2200      	movs	r2, #0
- 8000b2a:	601a      	str	r2, [r3, #0]
- 8000b2c:	e000      	b.n	8000b30 <delay_ms+0x58>
-    if (ms == 0) return;
- 8000b2e:	bf00      	nop
+ 8000b0c:	4b06      	ldr	r3, [pc, #24]	@ (8000b28 <SystemClock_Config_Max+0x104>)
+ 8000b0e:	689b      	ldr	r3, [r3, #8]
+ 8000b10:	f003 030c 	and.w	r3, r3, #12
+ 8000b14:	2b08      	cmp	r3, #8
+ 8000b16:	d1f9      	bne.n	8000b0c <SystemClock_Config_Max+0xe8>
 }
- 8000b30:	3714      	adds	r7, #20
- 8000b32:	46bd      	mov	sp, r7
- 8000b34:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000b38:	4770      	bx	lr
- 8000b3a:	bf00      	nop
- 8000b3c:	20000008 	.word	0x20000008
- 8000b40:	10624dd3 	.word	0x10624dd3
- 8000b44:	e000e010 	.word	0xe000e010
+ 8000b18:	bf00      	nop
+ 8000b1a:	bf00      	nop
+ 8000b1c:	3724      	adds	r7, #36	@ 0x24
+ 8000b1e:	46bd      	mov	sp, r7
+ 8000b20:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000b24:	4770      	bx	lr
+ 8000b26:	bf00      	nop
+ 8000b28:	40023800 	.word	0x40023800
+ 8000b2c:	40023804 	.word	0x40023804
+ 8000b30:	40023808 	.word	0x40023808
+ 8000b34:	40023840 	.word	0x40023840
+ 8000b38:	40007000 	.word	0x40007000
+ 8000b3c:	40007004 	.word	0x40007004
+ 8000b40:	40023c00 	.word	0x40023c00
+ 8000b44:	00403604 	.word	0x00403604
 
 08000b48 <DMA2_config_SPI1_TX>:
 #include "spi.h"
