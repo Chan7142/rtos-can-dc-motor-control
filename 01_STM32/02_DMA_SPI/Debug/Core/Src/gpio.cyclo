@@ -1,0 +1,5 @@
+../Core/Src/gpio.c:3:6:GPIO_pin_Mode	1
+../Core/Src/gpio.c:8:6:GPIO_Write_Pin	2
+../Core/Src/gpio.c:13:9:GPIO_Read_Pin	1
+../Core/Src/gpio.c:16:6:GPIO_Clock_Enable	12
+../Core/Src/gpio.c:33:6:GPIO_Speed_Set	1

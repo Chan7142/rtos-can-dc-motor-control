@@ -1,0 +1,12 @@
+../Core/Src/fonts.c:316:6:ST7735_Init	1
+../Core/Src/fonts.c:339:6:ST7735_SetAddressWindow	1
+../Core/Src/fonts.c:354:6:ST7735_FillScreen	2
+../Core/Src/fonts.c:361:6:ST7735_HW_Reset	1
+../Core/Src/fonts.c:371:6:ST7735_WriteCommand	2
+../Core/Src/fonts.c:380:6:ST7735_WriteData	2
+../Core/Src/fonts.c:388:6:ST7735_WriteString	3
+../Core/Src/fonts.c:398:6:ST7735_DrawChar	4
+../Core/Src/fonts.c:419:6:A0_pin_set	1
+../Core/Src/fonts.c:422:6:A0_pin_reset	1
+../Core/Src/fonts.c:425:6:RESET_pin_set	1
+../Core/Src/fonts.c:428:6:RESET_pin_reset	1
