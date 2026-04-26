@@ -16,13 +16,6 @@ void delay_ms(uint32_t ms) {
     SysTick->CTRL = 0;
 }
 void SystemClock_Config_Max(void) {
-    volatile uint32_t *const RCC_CR      = (uint32_t *)0x40023800UL;
-    volatile uint32_t *const RCC_PLLCFGR = (uint32_t *)0x40023804UL;
-    volatile uint32_t *const RCC_CFGR    = (uint32_t *)0x40023808UL;
-    volatile uint32_t *const RCC_APB1ENR = (uint32_t *)0x40023840UL;
-    volatile uint32_t *const PWR_CR1     = (uint32_t *)0x40007000UL;
-    volatile uint32_t *const PWR_CSR1    = (uint32_t *)0x40007004UL;
-    volatile uint32_t *const FLASH_ACR   = (uint32_t *)0x40023C00UL;
 
     /* 2. HSE (External Crystal) 활성화 */
     RCC->CR |= (1 << 16); // HSEON
