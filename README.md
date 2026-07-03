@@ -1,41 +1,41 @@
-# STM32 Register-Level DC Motor Control
+# STM32 Register-Level BLDC Motor Control
 
-이 프로젝트는 STM32 MCU를 활용하여 하드웨어 추상화 계층(HAL) 없이 **레지스터 직접 제어(Register-Level Control)**를 통해 모터 제어 시스템을 구축하는 연구 프로젝트입니다.
+STM32 mcu를 사용한 BLDC FOC 위치제어 프로젝트 (전류제어루프X)
 
-## 📌 Project Overview
-모터 제어 시스템의 응답 속도 최적화와 MCU 내부 구조의 깊이 있는 이해를 위해 모든 드라이버를 직접 설계했습니다. 현재 DC 모터의 물리적 특성을 파악하기 위한 **시스템 식별(System Identification)** 단계를 진행 중입니다.
-FreeRTOS 기반 RTOS 아키텍처로 이관하고, CAN 지령 기반 BLDC FOC(Field-Oriented Control)까지 확장할 계획입니다.
 
-## 🛠 Core Tech Stack
-- **Hardware**: STM32F767ZI (Cortex-M7)
-- **Programming**: C (Register-level)
-- **Peripherals**: GPIO, TIM (PWM, Encoder), UART, SPI
-- **Control Theory**: System Identification, Transfer Function Analysis
+핵심 하드웨어 소개
+<img width="1534" height="862" alt="하드웨어소개" src="https://github.com/user-attachments/assets/5cb7446f-2e83-46a2-b344-c0d9b262e71d" />
 
-## 🚀 Key Features (Custom Libraries)
-모든 라이브러리는 데이터시트를 참조하여 레지스터 단위로 직접 구현되었습니다.
+사용 툴 소프트웨어
+matlab(simulink), python, vscode, stm32cudeide, stm32cubemx
 
-*   **Clock Configuration**: 시스템 클록(216MHz) 및 버스 클록 최적화 설정
-*   **PWM Control (TIM5)**: 모터 드라이버 제어를 위한 고정밀 PWM 신호 생성
-*   **Encoder Interface**: 타이머 하드웨어 카운터를 이용한 QEI(Quadrature Encoder Interface) 구현
-*   **Communication**: 
-    *   **UART**: 디버깅 및 데이터 모니터링용 인터럽트 기반 통신
-    *   **SPI**: 고속 센서 데이터 수집을 위한 통신 드라이버
-*   **GPIO**: 고속 스위칭을 위한 최적화된 I/O 제어
+MCU 펌웨어 : HAL 라이브러리 없이 직접 레지스터 조작하여 드라이버 함수 제작
+(PWM, I2C, SPI, USART, TIM)
 
-## 📈 Current Progress: System Identification
-단순한 구동을 넘어, 제어 공학적 접근을 통해 시스템을 분석하고 있습니다.
+모터 전달 함수: Vq축 전압에 4.0V 스텝응답에 대한 전달함수 (파이썬 사용)
+<img width="1181" height="728" alt="image" src="https://github.com/user-attachments/assets/c386da2c-c97b-40e0-be31-e1b6b149b87a" />
+ 추출된 전달함수 G(s)   = 24.6293 / (0.0120s + 1)
 
-1.  **Step Response Test**: DC 모터에 6V 스텝 입력을 인가하여 실시간 속도 응답 데이터 수집 완료
-2.  **Modeling**: 수집된 데이터를 기반으로 시스템의 **전달함수(Transfer Function)** 도출 진행 중
-3.  **Goal**: 도출된 모델을 바탕으로 최적의 PID 제어기 파라미터를 설계할 예정입니다.
+ 적용된 제어 알고리즘
+ 1. P-PI cascade 위치제어
+ 2. 전차원 관측기(위치,속도,외란 추정)
 
-## 📂 Project Structure
-```text
-├── Drivers/
-│   ├── GPIO/          # Register-level GPIO Drivers
-│   ├── TIM/           # PWM & Encoder Mode Configuration
-│   ├── UART/          # Interrupt-based Communication
-│   └── SPI/           # High-speed Sensor Interface
-├── Docs/              # Step Response Data & Analysis
-└── main.c             # System Initialization & Control Loop
+전체 제어 모델링 (simulink)
+<img width="916" height="429" alt="매틀랩제어선도" src="https://github.com/user-attachments/assets/9ffce95f-090e-4705-8f88-f94ae417c425" />
+<img width="1028" height="792" alt="제어선도" src="https://github.com/user-attachments/assets/ea85f120-d808-4713-b6f6-1b701e588247" />
+
+전차원 관측기 식
+
+<img width="438" height="365" alt="image" src="https://github.com/user-attachments/assets/9d6a635c-5e6c-4de5-805b-db0a5fc16df5" />
+
+
+SIMULINK 자동 C코드 생성 기능 사용 -> MCU 제어알고리즘 적용 (이산화 적용 및 변수 연결) (Subsystem.c Subsystem.h 파일 각각 생성 후 적용)
+
+CAN 통신 지령: 파이썬 코드에서 2초마다 0.0, 45.5, 90.0, -180.0 디그리 반복 지령
+<img width="432" height="53" alt="image" src="https://github.com/user-attachments/assets/b500c179-a1bf-42eb-b0f7-3f6de456c070" />
+
+
+실험결과
+<img width="1487" height="777" alt="image" src="https://github.com/user-attachments/assets/c0d7ff12-0e51-4fcc-b241-cba283579d70" />
+우수한 제어성능 확인
+(구동영상 참조)
