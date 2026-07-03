@@ -21,6 +21,8 @@ void DMA2_config_SPI1_TX(uint32_t buffer_addr, uint32_t size);
 
 void SPI1_DMA_transfer(uint8_t *addr, uint32_t len);
 void SPI1_WriteByte_Polling(uint8_t data);
+float AS5047P_GetAngleRad(void);
+uint16_t SPI1_Transfer16(uint16_t data);
 
 void CS_ON();
 void CS_OFF();

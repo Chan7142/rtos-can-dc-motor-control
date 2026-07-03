@@ -1,8 +1,8 @@
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Drivers/CMSIS/Include/cmsis_compiler.h \
- ../Drivers/CMSIS/Include/cmsis_gcc.h \
+ C:/Users/leesc/Desktop/rtos-can-bldc-motor-control/01_STM32/02_BLDC_TEST/Drivers/CMSIS/Include/cmsis_compiler.h \
+ C:/Users/leesc/Desktop/rtos-can-bldc-motor-control/01_STM32/02_BLDC_TEST/Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
@@ -18,8 +18,8 @@ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-../Drivers/CMSIS/Include/cmsis_compiler.h:
-../Drivers/CMSIS/Include/cmsis_gcc.h:
+C:/Users/leesc/Desktop/rtos-can-bldc-motor-control/01_STM32/02_BLDC_TEST/Drivers/CMSIS/Include/cmsis_compiler.h:
+C:/Users/leesc/Desktop/rtos-can-bldc-motor-control/01_STM32/02_BLDC_TEST/Drivers/CMSIS/Include/cmsis_gcc.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:

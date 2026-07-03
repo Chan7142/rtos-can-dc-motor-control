@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <Subsystem.h>
 #include <math.h>
+#include <arm_math.h>
 #include "stm32f7xx_it.h"
 #include "encoder.h"
 #include "usart.h"
@@ -39,6 +40,7 @@
 extern volatile uint32_t msTicks = 0;
 const uint32_t ENCODER_RESOLUTION = 1320;
 void SystemClock_Config_Max(void);
+float speed_rad_filtered = 0.0f;
 uint32_t current_cnt = 0;
 float gCount = 0;
 float mCount = 0;
@@ -54,7 +56,7 @@ float theta_rad = 0;
 float theta_degree = 0;
 float desired_theta = 0;
 float Ts = 0.001;
-float Tc = 0.001;
+float Tc = 0.00005;
 const float pole_pairs = 7;
 float angle_e = 0;
 float I_a = 0;
@@ -70,6 +72,7 @@ float Iq_ref = 0;
 float Id = 0;
 float Iq = 0;
 float ADC_ref = 0;
+float Vq_ref = 0;
 char buf[32];
 uint32_t debug_ADC1 = 0;
 uint32_t debug_ADC2 = 0;
@@ -128,14 +131,14 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 256 * 4,
+  .stack_size = 0 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for motorControl */
 osThreadId_t motorControlHandle;
 const osThreadAttr_t motorControl_attributes = {
   .name = "motorControl",
-  .stack_size = 1024 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for SPI */
@@ -156,7 +159,7 @@ const osThreadAttr_t CAN_attributes = {
 osThreadId_t UARTHandle;
 const osThreadAttr_t UART_attributes = {
   .name = "UART",
-  .stack_size = 256 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
@@ -190,13 +193,13 @@ void UART_T(void *argument);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
 
   /* MPU Configuration--------------------------------------------------------*/
-  MPU_Config();
+
+ 	MPU_Config();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -219,40 +222,41 @@ int main(void)
   MX_GPIOG_Init();
   MX_ETH_Init();
   MX_USB_OTG_FS_PCD_Init();
+  HAL_Delay(1000);
   /* USER CODE BEGIN 2 */
 	SPI_GPIO_Init();
 	DMA_Init();
-	uint8_t test_data[4] = {0xAA, 0xBB, 0xCC, 0xDD};
-	DMA2_config_SPI1_TX((uint32_t)test_data, 4);
-
-	ST7735_Init();              // 1. 초기화 (이전 단계에서 만든 함수)
-	ST7735_FillScreen(0x0000);  // 2. 검정색으로 배경 채우기
-	ST7735_WriteString(10, 50, "Hello World", Font_7x10, 0xFFFF, 0x0000);
+//	uint8_t test_data[4] = {0xAA, 0xBB, 0xCC, 0xDD};
+//	DMA2_config_SPI1_TX((uint32_t)test_data, 4);
 	PWM_TIM5_CH1_Init(1000);
 	PWM_TIM5_CH1_Setduty(80); //80% pwm duty
-	PWM_TIM1_Base_Init(1000); //5000
+	float freq = 1/Tc;
+	PWM_TIM1_Base_Init((int)freq); //20000
 	PWM_TIM1_CH1_Init();
 	PWM_TIM1_CH2_Init();
 	PWM_TIM1_CH3_Init();
 	Encoder_TIM4_Init();
 	Usart3_TX_Init(115200);
 	DMA_USART3_Init();
-	TIM2_Init();
+
 	Subsystem_initialize();
 	Can1_Init();
 	Can1_Filter_Config();
 	I2C1_DMA_Init();
-	ADC_Init();
+
 	//Iq_ref = 0.4f;
-	Wc = 2.0f * pi * 1.0f;
+	Wc = 2.0f * pi * (1.0f/(20*Tc))*0.5; //
 	Kpc = Ls*Wc;
-	Kic = Rs*Wc;
+	Kic = Rs*Wc; //
 //	Kpc = 0.1;
 //	Kic = 0.01;
 //	PWM_TIM1_CH1_Setduty(0.5);
 /* USER CODE END RTOS_EVENTS */
 /* Start scheduler */
-
+//	GPIOG->ODR |= (1 << 1); //I2C 통신 시작
+//	delay_ms(5);
+	AS5600_Set_Configuration();
+//	GPIOG->ODR &= ~(1 << 1); //I2C 통신 끝
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -527,26 +531,39 @@ float Tm = 0.01;
 float flux = 0.0035;
 float theta_rad_prev = 0;
 float V_bus = 12.0f;
+float ref = 0.0f;
+
+float theta_rad_adc = 0;
+float theta_degree_adc = 0;
+float multi_turn_theta = 0.0f;
+float multi_turn_theta_deg = 0.0f;
+float N = 0.0f;
 void get_motor_status(){
-	theta_rad = Process_Encoder_Data();
+	theta_rad = Process_Encoder_Data(); //  spi 통신
 	theta_degree = theta_rad * 180 / pi;
-	angle_e = theta_rad * pole_pairs - 1.60f;
-	angle_e = fmodf(angle_e, 2.0f * pi);
+
 	float delta_theta = theta_rad - theta_rad_prev;
 	if (delta_theta > pi) {
-	    delta_theta -= 2.0f * pi;
+	    N -= 1.0f;
 	}
 	else if (delta_theta < -pi) {
-	    delta_theta += 2.0f * pi;
+	    N += 1.0f;
 	}
-	speed_rad = (delta_theta)/Tc;
-	speed_rpm = speed_rad * 60 / (2*pi);
+	multi_turn_theta = theta_rad + N * 2 * pi;
+	multi_turn_theta_deg = multi_turn_theta * 180 / pi;
 	theta_rad_prev = theta_rad;
 }
+float Vd_I = 0.0f;
+float Vq_I = 0.0f;
 void ADC_IRQHandler(void) {
     if (ADC1->SR & (1 << 2)) { // JEOC 비트 (Bit 2)가 1인지 확인
     	ADC1->SR = ~(1 << 2);
-    	get_motor_status();
+//    	get_motor_status();
+    	theta_rad += speed_rad_filtered*Tc;
+    	float offset = 1.57233036;
+    	angle_e = (theta_rad - offset) * pole_pairs ; //
+    	angle_e = fmodf(angle_e, 2.0f * pi);
+    	if (angle_e < 0.0f) angle_e += 2.0f * pi;
     	//angle_e = angle_e + speed_rad * pole_pairs * Tc; //전기각 보간
 
         // 변환된 전류 데이터 읽기
@@ -557,16 +574,17 @@ void ADC_IRQHandler(void) {
     	float V_pin_a = (float)(ADC1->JDR1) * (3.3f / 4095.0f);
     	float V_pin_b = (float)(ADC1->JDR2) * (3.3f / 4095.0f);
     	ADC_ref = (float)(ADC1->JDR3) * (3.3f / 4095.0f);
-    	I_a = (V_pin_a - ADC_ref) / (0.005f * 40.0f);
-    	I_b = (V_pin_b - ADC_ref) / (0.005f * 40.0f);
+    	I_a = (V_pin_a - ADC_ref) / (0.005f * 12.22f);
+    	I_b = (V_pin_b - ADC_ref) / (0.005f * 12.22f);
 
         I_c = -I_a - I_b;
         float I_alpha = I_a;
         float I_beta = (I_a + 2.0f * I_b) / sqrtf(3.0f);
 
-        float cos_t = cosf(angle_e);
-        float sin_t = sinf(angle_e);
-
+//        float cos_t = cosf(angle_e);
+//        float sin_t = sinf(angle_e);
+          float cos_t = arm_cos_f32(angle_e);
+          float sin_t = arm_sin_f32(angle_e);
          Id =  I_alpha * cos_t + I_beta * sin_t;
          Iq = -I_alpha * sin_t + I_beta * cos_t;
 
@@ -577,22 +595,20 @@ void ADC_IRQHandler(void) {
         Vd_pi = Vd_km1 + Kpc * (ed - ed_km1) + Kic*Tc*ed;
 		Vq_pi = Vq_km1 + Kpc * (eq - eq_km1) + Kic*Tc*eq;
 
-		if (Vd_pi > V_bus) Vd_pi = V_bus;
-		else if (Vd_pi < -V_bus) Vd_pi = -V_bus;
+		if (Vd_pi > (V_bus/sqrtf(3.0f))) Vd_pi = (V_bus/sqrtf(3.0f));
+		else if (Vd_pi < -(V_bus/sqrtf(3.0f))) Vd_pi = -(V_bus/sqrtf(3.0f));
 
-		if (Vq_pi > V_bus) Vq_pi = V_bus;
-		else if (Vq_pi < -V_bus) Vq_pi = -V_bus;
+		if (Vq_pi > (V_bus/sqrtf(3.0f))) Vq_pi = (V_bus/sqrtf(3.0f));
+		else if (Vq_pi < -(V_bus/sqrtf(3.0f))) Vq_pi = -(V_bus/sqrtf(3.0f));
 
 		ed_km1 = ed; Vd_km1 = Vd_pi;
 		eq_km1 = eq; Vq_km1 = Vq_pi;
 
-		ed_km1 = ed; Vd_km1 = Vd_pi;
-        eq_km1 = eq; Vq_km1 = Vq_pi;
+//        Vd = Vd_pi - speed_rad_filtered * Ls * Iq;
+//        Vq = Vq_pi + speed_rad_filtered * Ls * Id + speed_rad_filtered * flux;
+		Vd = 0;
+		Vq = Vq_ref;
 
-        Vd = Vd_pi - speed_rad * Ls * Iq;
-        Vq = Vq_pi + speed_rad * Ls * Id + speed_rad * flux;
-//        Vd = 0;
-//        Vq = 1.5;
 
 		float V_alpha = Vd * cos_t - Vq * sin_t;
 		float V_beta  = Vd * sin_t + Vq * cos_t;
@@ -601,22 +617,28 @@ void ADC_IRQHandler(void) {
 		Vb = (-V_alpha + sqrtf(3.0f) * V_beta) / 2.0f;
 		Vc = (-V_alpha - sqrtf(3.0f) * V_beta) / 2.0f;
 
+//		float V_max = Va; if (Vb > V_max) V_max = Vb; if (Vc > V_max) V_max = Vc;
+//		float V_min = Va; if (Vb < V_min) V_min = Vb; if (Vc < V_min) V_min = Vc;
+//	    float V_com = 0.5f * (V_max + V_min);
+//
+//	    Va -= V_com;
+//	    Vb -= V_com;
+//	    Vc -= V_com;
+
 		float duty_a = (Va / V_bus) + 0.5f;
 		float duty_b = (Vb / V_bus) + 0.5f;
 		float duty_c = (Vc / V_bus) + 0.5f;
 
-		if (duty_a > 1.0f) duty_a = 1.0f; else if (duty_a < 0.0f) duty_a = 0.0f;
-		if (duty_b > 1.0f) duty_b = 1.0f; else if (duty_b < 0.0f) duty_b = 0.0f;
-		if (duty_c > 1.0f) duty_c = 1.0f; else if (duty_c < 0.0f) duty_c = 0.0f;
-
 		PWM_TIM1_CH1_Setduty(duty_a);
 		PWM_TIM1_CH2_Setduty(duty_b);
 		PWM_TIM1_CH3_Setduty(duty_c);
+//				PWM_TIM1_CH1_Setduty(0.8);
+//				PWM_TIM1_CH2_Setduty(0.2);
+//				PWM_TIM1_CH3_Setduty(0.2);
 
-		gCount += Ts;
-		time = gCount;
 
-//    	float V_test = 1.5f; // 12V 배터리 기준 약 1.5V 인가
+
+//    	float V_test = 4.0f; // 12V 배터리 기준 약 1.5V 인가
 //
 //    	        // 1. 역방향 변환 시 전기각을 무조건 0으로 고정
 //    	        float cos_t = 1.0f; // cos(0)
@@ -637,32 +659,56 @@ void ADC_IRQHandler(void) {
 //    	        float duty_a = (Va / V_bus) + 0.5f;
 //    	        float duty_b = (Vb / V_bus) + 0.5f;
 //    	        float duty_c = (Vc / V_bus) + 0.5f;
-//
-//    	        PWM_TIM1_CH1_Setduty(duty_a);
-//    	        PWM_TIM1_CH2_Setduty(duty_b);
-//    	        PWM_TIM1_CH3_Setduty(duty_c);
+
+//    	        PWM_TIM1_CH1_Setduty(0.6);
+//    	        PWM_TIM1_CH2_Setduty(0.0);
+//    	        PWM_TIM1_CH3_Setduty(0.0);
 
 		GPIOG->ODR ^= (1 << 0); //확인용 토글
 
     }
 
     if (ADC2->SR & (1 << 2)) {
-        ADC2->SR &= ~(1 << 2);
-    }
+          ADC2->SR &= ~(1 << 2);
+      }
 }
+float multi_turn_theta_prev = 0;
+
+float e_p = 0.0f;
+float e_k = 0.0f;
+float e_km1 = 0.0f;
+float u_km1 = 0.0f;
+float Kp = 0.00001;
+float Ki = 0.005;
 void TIM2_IRQHandler(void) {
     if (TIM2->SR & (1<<0)) {
         TIM2->SR &= ~(1<<0);
-//        rtU.theta = theta_rad;   // 위치 피드백 연결
-//        rtU.speed_rad = speed_rad;    // 속도 피드백 연결
-//        Subsystem_step();
-//        motor_input((float)rtY.input);
-//       	gCount += Ts;
-//        time = gCount;
-//        get_motor_status();
+        get_motor_status();
+        float delta_theta2 = multi_turn_theta - multi_turn_theta_prev;
+    	speed_rad = (delta_theta2)/Ts;
+    	float alpha = 0.2f;
+    	speed_rad_filtered = (1.0f - alpha) * speed_rad_filtered + alpha * speed_rad;
+    	speed_rpm = speed_rad_filtered * 60 / (2*pi);
+    	multi_turn_theta_prev = multi_turn_theta;
+        rtU.theta = multi_turn_theta;   // 위치 피드백 연결
+        rtU.speed_rad = speed_rad_filtered;    // 속도 피드백 연결
+        Subsystem_step();
+        Vq_ref = rtY.input;
+
+//        e_p = ref - multi_turn_theta;
+//        e_k = e_p * 5.0f - speed_rad_filtered;
+//        e_k = 35.0f - speed_rad_filtered;
+////        e_k = ref - multi_turn_theta;
+//        u_k = u_km1 + Kp * (e_k - e_km1) + Ki * Ts * e_k;
+//        u_km1 = u_k;
+//        e_km1 = e_k;
+
+//        Vq_ref = u_k;
+//        Vq_ref = 4.0f;
 //        GPIOG->ODR ^= (1 << 0); //확인용 토글
-        Iq_ref = 0.1f*(35.65f-speed_rad);
-//        Iq_ref = 0.4;
+        gCount += Ts;
+        time = gCount;
+//  	  printf("%.3f, %.3f\n", time, speed_rad);
 
     }
 }
@@ -678,6 +724,11 @@ void TIM2_IRQHandler(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+	ADC_Init();
+	ADC3_Init();
+	TIM2_Init();
+	NVIC_SetPriority(ADC_IRQn, 5);
+		NVIC_EnableIRQ(ADC_IRQn);
   /* Infinite loop */
   for(;;)
   {
@@ -701,8 +752,13 @@ void mControl(void *argument)
   /* Infinite loop */
   for(;;)
   {
-
-    osDelay(1);
+//      rtU.theta = multi_turn_theta;   // 위치 피드백 연결
+//      rtU.speed_rad = speed_rad;    // 속도 피드백 연결
+//      Subsystem_step();
+//      u_k = rtY.input;
+//      Iq_ref = u_k;
+	  e_p = ref - multi_turn_theta;
+    osDelay(20);
   }
   /* USER CODE END mControl */
 }
@@ -720,11 +776,11 @@ void SPI_T(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  //
-	  sprintf(buf, "RPM: %5d", (int)speed_rpm);
-	  ST7735_WriteString(10, 50, buf, Font_7x10, 0xFFFF, 0x0000);
 	  spi_count++;
-    osDelay(50);
+//	  sprintf(buf, "RPM: %5d", (int)speed_rpm);
+//	  ST7735_WriteString(10, 50, buf, Font_7x10, 0xFFFF, 0x0000);
+
+    osDelay(100);
   }
   /* USER CODE END SPI_T */
 }
@@ -736,6 +792,7 @@ void SPI_T(void *argument)
 * @retval None
 */
 /* USER CODE END Header_CAN_T */
+float canCount = 0;
 void CAN_T(void *argument)
 {
   /* USER CODE BEGIN CAN_T */
@@ -744,9 +801,12 @@ void CAN_T(void *argument)
   {
 
 	  desired_theta_deg = Can1_Receive_Handler(desired_theta_deg);
-	  rtU.ref = desired_theta_deg * pi / 180.0f;
-	  Can1_Send_MotorStatus(theta_degree, speed_rpm);
-    osDelay(1);
+//	  desired_theta_deg = 180.0f;
+	  ref = desired_theta_deg * pi / 180.0f;
+	  rtU.ref = ref;
+//	  Can1_Send_MotorStatus(theta_degree, speed_rpm);
+	  canCount++;
+    osDelay(10);
   }
   /* USER CODE END CAN_T */
 }
@@ -758,6 +818,7 @@ void CAN_T(void *argument)
 * @retval None
 */
 /* USER CODE END Header_UART_T */
+static char tx_buf[128];
 void UART_T(void *argument)
 {
   /* USER CODE BEGIN UART_T */
@@ -765,7 +826,12 @@ void UART_T(void *argument)
   for(;;)
   {
 	  mCount++;
-	printf("%.2f, %.2f\n", time, speed_rad);
+//	  printf("%.3f, %.3f\n", time, multi_turn_theta);
+	printf("%.3f, %.3f, %.3f\n", time, rtU.ref, multi_turn_theta);
+//	  printf("%.3f, %.3f\n", time, speed_rad);
+//	  printf("%.3f, %.4f, %.4f\n", time, Id, Iq);
+//	  printf("%.2f, %.3f, %.3f, %.3f\n", time, I_a, I_b,I_c);
+//	  printf("%d, %d, %d, %d\n", (int)(time*1000), (int)(I_a * 1000), (int)(I_b * 1000), (int)(I_c * 1000));
     osDelay(10);
   }
   /* USER CODE END UART_T */

@@ -30,5 +30,5 @@ typedef struct{
 void Usart3_TX_Init(uint32_t baudrate);
 
 void DMA_USART3_Init();
-void USART3_DMA_Send(uint8_t *data, uint16_t size);
+uint8_t USART3_DMA_Send(uint8_t *data, uint16_t size);
 #endif

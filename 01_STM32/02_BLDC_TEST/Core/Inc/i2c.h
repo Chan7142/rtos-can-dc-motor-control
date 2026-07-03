@@ -23,6 +23,7 @@ typedef struct{
 
 #define I2C1    ((I2C_Type *)I2C1_BASE)
 void I2C1_DMA_Init();
+void AS5600_Set_Configuration();
 
 void I2C1_ReadReg_DMA(uint8_t reg_addr, uint8_t *pBuffer, uint16_t size);
 float Process_Encoder_Data(void);

@@ -33,7 +33,8 @@ void I2C1_DMA_Init(){
 	DMA1->S[6].CR |= (1 << 6);  // DIR = 01 (Memory-to-peripheral, 메모리 -> 주변장치)
 	DMA1->S[6].PAR = (uint32_t)&(I2C1->TXDR);
 
-	I2C1->TIMINGR = 0x20404768;
+	I2C1->TIMINGR = 0x00200922;
+//	I2C1->TIMINGR = 0x20404768; //100 kHz
 	// I2C 내부 DMA 활성화 및 기본 타이밍 설정
 	I2C1->CR1 |= (1 << 14) | (1 << 15);     // DMAEN = 1 (I2C 내부에서 DMA 요청을 던지도록 허용)
 
@@ -81,6 +82,59 @@ void I2C1_ReadReg_DMA(uint8_t reg_addr, uint8_t *pBuffer, uint16_t size) {
     I2C1->ICR |= (1 << 5);               // STOPF 클리어
 
     DMA1->S[0].CR &= ~(1 << 0);          // DMA 후처리
+}
+
+void I2C1_WriteReg_DMA(uint8_t reg_addr, uint8_t *pBuffer, uint16_t size) {
+    while (I2C1->ISR & (1 << 15));
+    I2C1->ICR |= 0x3F38;
+    I2C1->CR2 = (AS5600_ADDR_7BIT << 1) | (1 << 16) | (1 << 24) | (1 << 13);
+
+    uint32_t timeout = 100000;
+    while (!(I2C1->ISR & (1 << 1))) {
+        if (I2C1->ISR & (1 << 4)) {
+            I2C1->ICR |= (1 << 4);
+            I2C1->CR2 |= (1 << 14);
+            return;
+        }
+        if (--timeout == 0) return;
+    }
+
+    I2C1->TXDR = reg_addr;
+
+
+    while (!(I2C1->ISR & (1 << 7)));
+
+
+    DMA1->S[6].CR &= ~(1 << 0);
+    while (DMA1->S[6].CR & (1 << 0));
+
+    DMA1->S[6].M0AR = (uint32_t)pBuffer;
+    DMA1->S[6].NDTR = size;
+
+    DMA1->HIFCR = (0x3D << 16);
+
+    DMA1->S[6].CR |= (1 << 0);
+
+    uint32_t tmpreg = I2C1->CR2;
+    tmpreg &= ~((0xFF << 16) | (1 << 24));
+    tmpreg |= ((uint32_t)size << 16) | (1 << 25);
+    I2C1->CR2 = tmpreg;
+
+    while (!(DMA1->HISR & (1 << 21)));
+
+    while (!(I2C1->ISR & (1 << 5)));
+    I2C1->ICR |= (1 << 5);
+
+    DMA1->S[6].CR &= ~(1 << 0);          // DMA 후처리 (끄기)
+}
+
+void AS5600_Set_Configuration(void) {
+    uint8_t conf_data[2];
+
+    conf_data[0] = 0x00; //
+    conf_data[1] = 0x00; //
+
+    I2C1_WriteReg_DMA(0x07, conf_data, 2);
 }
 
 float Process_Encoder_Data(void) {

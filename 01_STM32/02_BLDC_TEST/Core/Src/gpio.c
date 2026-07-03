@@ -48,4 +48,14 @@ void MX_GPIOG_Init(void)
 	GPIOG->PUPDR &= ~(3 << (2 * 0));
 
 	GPIOG->OSPEEDR &= ~(3 << (2 * 0));
+
+	GPIOG->MODER &= ~(3 << (2 * 1));
+	GPIOG->MODER |=  (1 << (2 * 1));
+
+
+	GPIOG->OTYPER &= ~(1 << 1);
+
+	GPIOG->PUPDR &= ~(3 << (2 * 1));
+
+	GPIOG->OSPEEDR &= ~(3 << (2 * 1));
 }

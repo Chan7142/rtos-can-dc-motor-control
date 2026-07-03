@@ -48,5 +48,7 @@ typedef struct {
 #define ADC_COMMON    ((ADC_Common_Type *)ADC_COMMON_BASE)
 
 void ADC_Init(void);
+void ADC3_Init(void);
+float Get_Angle_Rad(float raw_adc);
 
 #endif

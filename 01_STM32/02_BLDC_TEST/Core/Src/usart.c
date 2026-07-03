@@ -35,10 +35,11 @@ void DMA_USART3_Init(){
 	// 채널4, 우선순위 중간,MINC ->1, Memory-to-Peripheral
 	DMA1->S[3].CR = (4 << 25) | (1 << 16) | (1 << 10) | (1 << 6);
 }
-void USART3_DMA_Send(uint8_t *data, uint16_t size) {
-    // 전송 중인지 확인 후 중지
-    DMA1->S[3].CR &= ~1UL;
-    while(DMA1->S[3].CR & 1UL);
+uint8_t USART3_DMA_Send(uint8_t *data, uint16_t size) {
+
+	if (DMA1->S[3].CR & 1UL) {
+	        return 0; // 전송 실패 (Busy)
+	    }
 
     // 전송 정보 업데이트
     DMA1->S[3].M0AR = (uint32_t)data;   // 전송할 버퍼 주소
@@ -49,6 +50,8 @@ void USART3_DMA_Send(uint8_t *data, uint16_t size) {
 
     // DMA 활성화 (전송 시작)
     DMA1->S[3].CR |= 1UL;
+
+    return 1;
 }
 int _write(int file, char *ptr, int len) {
     USART3_DMA_Send((uint8_t *)ptr, (uint16_t)len);

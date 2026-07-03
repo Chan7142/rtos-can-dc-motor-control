@@ -18,7 +18,6 @@ void DMA2_config_SPI1_TX(uint32_t buffer_addr, uint32_t size){
 
     SPI1->CR1 &= ~(1 << 6); // 일단 SPI 끄기 (설정 변경을 위해)
 
-    // Baud Rate: 108MHz
     SPI1->CR1 &= ~(7 << 3);
     SPI1->CR1 |=  (3 << 3);
     SPI1->CR1 &= ~(1 << 0); // CPHA = 0
@@ -26,7 +25,7 @@ void DMA2_config_SPI1_TX(uint32_t buffer_addr, uint32_t size){
 
 
     SPI1->CR2 &= ~(0xF << 8);
-    SPI1->CR2 |=  (0x7 << 8);
+    SPI1->CR2 |=  (0xF << 8); //16비트
 
     SPI1->CR2 |= (1 << 12);
 
@@ -93,12 +92,54 @@ void SPI_GPIO_Init(void) {
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_7;
+    // SPI1 SCK(PA5), MISO(PA6), MOSI(PA7) 설정
+    GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7; // PA6(MISO) 추가
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+uint16_t SPI1_Transfer16(uint16_t data) {
+    // 1. TXE (송신 버퍼 빔) 대기
+    while (!(SPI1->SR & (1 << 1)));
+    *((volatile uint16_t *)&SPI1->DR) = data;
+
+    // 2. RXNE (수신 버퍼 참) 대기
+    while (!(SPI1->SR & (1 << 0)));
+    uint16_t rx_data = *((volatile uint16_t *)&SPI1->DR);
+
+    // 3. BSY (바쁨) 대기
+    while (SPI1->SR & (1 << 7));
+
+    return rx_data;
+}
+
+#define AS5047P_CMD_READ_ANGLE 0xFFFF // ANGLECOM(0x3FFF) + Read(Bit14) + Even Parity(Bit15)
+#define PI_2 6.283185307179586f       // 2 * PI
+
+static float filtered_angle_rad = 0.0f;
+
+float AS5047P_GetAngleRad(void) {
+    uint16_t raw_data;
+
+    CS_ON();
+    for(volatile int i=0; i<2; i++);
+
+    raw_data = SPI1_Transfer16(AS5047P_CMD_READ_ANGLE);
+
+    for(volatile int i=0; i<2; i++);
+    CS_OFF();
+
+    raw_data &= 0x3FFF;
+
+    float current_angle_rad = ((float)raw_data / 16384.0f) * PI_2;
+
+    filtered_angle_rad = (0.1f * current_angle_rad) + (0.9f * filtered_angle_rad);
+
+
+    return filtered_angle_rad;
 }
 
 

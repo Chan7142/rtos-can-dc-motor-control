@@ -4,17 +4,17 @@ from scipy.optimize import curve_fit
 
 # 1. 데이터 로드 (파일 포맷에 따라 구분자 확인 필요)
 # 메모장에 '시간, 속도' 형태로 저장되어 있다고 가정합니다.
-file_name = 'BLDC_motor_transfer.txt'
+file_name = 'BLDC_TF.txt'
 try:
-    data = np.loadtxt(r'C:\Users\leesc\Desktop\rtos-can-bldc-motor-control\03_python\BLDC_TF4.txt', delimiter=',') 
+    data = np.loadtxt(r'C:\Users\leesc\Desktop\rtos-can-bldc-motor-control\03_python\BLDC_TF.txt', delimiter=',') 
 except:
-    data = np.loadtxt(r'C:\Users\leesc\Desktop\rtos-can-bldc-motor-control\03_python\BLDC_TF4.txt')
+    data = np.loadtxt(r'C:\Users\leesc\Desktop\rtos-can-bldc-motor-control\03_python\BLDC_TF.txt')
 
 t_data = data[:, 0]  # 시간 (s)
 y_data = data[:, 1]  # 출력 속도 (rad/s)
 
 # 입력값 정의 (BLDC 모터의 q축 전류 지령값)
-Iq_ref = 0.2
+Iq_ref = 0.4
 
 # 2. 1차 시스템 계단 응답 함수 정의
 # y(t) = K * Iq_ref * (1 - exp(-t / tau))

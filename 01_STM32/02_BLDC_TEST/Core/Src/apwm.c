@@ -8,8 +8,8 @@ void PWM_TIM1_Base_Init(uint32_t freq) {
     RCC->AHB1ENR |= (1 << 4);
     RCC->APB2ENR |= (1 << 0);
 
-    TIM1->PSC = 108 - 1;
-    TIM1->ARR = (1000000 / freq)  - 1;
+    TIM1->PSC = 1 - 1;
+    TIM1->ARR = (216000000 / (2 * freq))  - 1;
 
     TIM1->CR1 |= (1 << 7);
 

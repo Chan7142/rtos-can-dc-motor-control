@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'Subsystem'.
  *
- * Model version                  : 1.9
+ * Model version                  : 1.17
  * Simulink Coder version         : 8.10 (R2016a) 10-Feb-2016
- * C/C++ source code generated on : Mon May 25 15:53:58 2026
+ * C/C++ source code generated on : Fri Jul 03 17:19:55 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -54,6 +54,9 @@ typedef struct {
 /* External outputs (root outports fed by signals with auto storage) */
 typedef struct {
   real_T input;                        /* '<Root>/input' */
+  real_T theta_hat;                    /* '<Root>/theta_hat' */
+  real_T speed_rad_hat;                /* '<Root>/speed_rad_hat' */
+  real_T d_hat;                        /* '<Root>/d_hat' */
 } ExtY;
 
 /* Real-time Model Data Structure */
@@ -84,6 +87,7 @@ extern RT_MODEL *const rtM;
  * Block '<S1>/Scope' : Unused code path elimination
  * Block '<S1>/Scope1' : Unused code path elimination
  * Block '<S1>/Scope2' : Unused code path elimination
+ * Block '<S1>/Scope3' : Unused code path elimination
  */
 
 /*-
@@ -98,15 +102,15 @@ extern RT_MODEL *const rtM;
  * MATLAB hilite_system command to trace the generated code back
  * to the parent model.  For example,
  *
- * hilite_system('DC_M_sim/Subsystem')    - opens subsystem DC_M_sim/Subsystem
- * hilite_system('DC_M_sim/Subsystem/Kp') - opens and selects block Kp
+ * hilite_system('BLDC_M_sim/Subsystem')    - opens subsystem BLDC_M_sim/Subsystem
+ * hilite_system('BLDC_M_sim/Subsystem/Kp') - opens and selects block Kp
  *
  * Here is the system hierarchy for this model
  *
- * '<Root>' : 'DC_M_sim'
- * '<S1>'   : 'DC_M_sim/Subsystem'
- * '<S2>'   : 'DC_M_sim/Subsystem/Discrete PID Controller'
- * '<S3>'   : 'DC_M_sim/Subsystem/Discrete PID Controller/Differentiator'
+ * '<Root>' : 'BLDC_M_sim'
+ * '<S1>'   : 'BLDC_M_sim/Subsystem'
+ * '<S2>'   : 'BLDC_M_sim/Subsystem/Discrete PID Controller'
+ * '<S3>'   : 'BLDC_M_sim/Subsystem/Discrete PID Controller/Differentiator'
  */
 #endif                                 /* RTW_HEADER_Subsystem_h_ */
 

@@ -30,7 +30,7 @@ def can_receive_thread(bus):
                     # msg.data[:4] -> 현재 위치, msg.data[4:] -> 현재 속도
                     current_pos, current_spd = struct.unpack('<ff', msg.data)
                     
-                    print(f"[수신] 현재 위치: {current_pos:6.2f}° | 현재 속도: {current_spd:6.2f} rpm")
+                    #print(f"[수신] 현재 위치: {current_pos:6.2f}° | 현재 속도: {current_spd:6.2f} rpm")
                 else:
                     print(f"[경고] 잘못된 데이터 길이 수신: {len(msg.data)} 바이트")
                     
@@ -65,10 +65,11 @@ def main():
     rx_thread.start()
 
     # 테스트용 가상 목표 각도 시나리오
-    target_angles = [0.0, 45.5, 90.0, 180.0, -45.5]
+    target_angles = [0.0, 45.5, 90.0, -180.0]
     angle_index = 0
 
-    print("Main 루프 시작: 1초마다 모터 지령(float) 송신...")
+    # 변경 포인트 1: 출력 메시지 수정
+    print("Main 루프 시작: 2초마다 모터 지령(float) 송신...")
     try:
         while True:
             # 3. 송신할 목표 각도 선택
@@ -89,9 +90,11 @@ def main():
             bus.send(msg)
             print(f"\n[송신] 목표 각도 지령 전송 완료 -> {angle_to_send}° (바이트: {packed_data.hex()})")
             
-            # 다음 지령 준비 및 1초 대기
+            # 다음 지령 준비 
             angle_index = (angle_index + 1) % len(target_angles)
-            time.sleep(1.0)
+            
+            # 변경 포인트 2: 1초 대기 -> 2초 대기로 수정
+            time.sleep(2.0)
             
     except KeyboardInterrupt:
         print("\n사용자에 의해 프로그램이 종료되었습니다.")
