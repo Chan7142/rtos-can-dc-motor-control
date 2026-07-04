@@ -10,7 +10,7 @@ STM32 mcu를 사용한 BLDC FOC 위치제어 프로젝트 (전류제어루프X)
 matlab(simulink), python, vscode, stm32cudeide, stm32cubemx
 
 MCU 펌웨어 : HAL 라이브러리 없이 직접 레지스터 조작하여 드라이버 함수 제작
-(PWM, I2C, SPI, USART, TIM)
+(PWM, I2C, SPI, USART, TIM, ADC)
 
 모터 전달 함수: Vq축 전압에 4.0V 스텝응답에 대한 전달함수 (파이썬 사용)
 <img width="1181" height="728" alt="image" src="https://github.com/user-attachments/assets/c386da2c-c97b-40e0-be31-e1b6b149b87a" />
