@@ -26,7 +26,8 @@ MCU 펌웨어 : HAL 라이브러리 없이 직접 레지스터 조작하여 드�
 
 전차원 관측기 식
 
-<img width="438" height="365" alt="17832421384011468545600160554171" src="https://github.com/user-attachments/assets/defe834b-ff5c-42bb-a7e9-1e79b3275acb" />
+<img width="890" height="502" alt="Screenshot_20260705_180312_Google" src="https://github.com/user-attachments/assets/8e093b09-90ee-4f5f-b7fa-d25944b5b746" />
+
 
 
 
