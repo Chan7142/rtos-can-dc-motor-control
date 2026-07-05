@@ -26,7 +26,8 @@ MCU 펌웨어 : HAL 라이브러리 없이 직접 레지스터 조작하여 드�
 
 전차원 관측기 식
 
-<img width="438" height="365" alt="image" src="https://github.com/user-attachments/assets/9d6a635c-5e6c-4de5-805b-db0a5fc16df5" />
+<img width="438" height="365" alt="17832421384011468545600160554171" src="https://github.com/user-attachments/assets/defe834b-ff5c-42bb-a7e9-1e79b3275acb" />
+
 
 
 SIMULINK 자동 C코드 생성 기능 사용 -> MCU 제어알고리즘 적용 (이산화 적용 및 변수 연결) (Subsystem.c Subsystem.h 파일 각각 생성 후 적용)
